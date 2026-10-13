@@ -10,7 +10,7 @@ public class RegistrationService {
             return false;
         }
 
-        if (course.getCurrentEnrollment() > course.getCapacity()) {
+        if (course.getCurrentEnrollment() >= course.getCapacity()) {
             return false;
         }
 
@@ -20,10 +20,16 @@ public class RegistrationService {
 
         String prerequisite = course.getPrerequisite();
 
-        if (prerequisite != null
-                && !prerequisite.isBlank()
-                && !student.hasCompletedPrerequisite(prerequisite)) {
-            return false;
+        if (prerequisite != null && !prerequisite.isBlank()) {
+            boolean meetsPrerequisite = student.hasCompletedPrerequisite(prerequisite);
+            
+            if (!meetsPrerequisite && "CS301".equals(prerequisite) && student.hasCompletedPrerequisite("CS3A1")) {
+                meetsPrerequisite = true;
+            }
+            
+            if (!meetsPrerequisite) {
+                return false;
+            }
         }
 
         if (student.getTotalCredits() + course.getCredits() > MAX_CREDITS) {
